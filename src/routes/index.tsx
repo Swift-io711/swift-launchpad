@@ -4,7 +4,7 @@ import heroMockup from "@/assets/hero-mockup.jpg";
 import portfolioArtisan from "@/assets/portfolio-artisan.jpg";
 import portfolioServices from "@/assets/portfolio-services.jpg";
 import portfolioConsultant from "@/assets/portfolio-consultant.jpg";
-import logoAsset from "@/assets/swift-logo.png.asset.json";
+import logoUrl from "@/assets/swift-logo.png";
 
 const TITLE = "Swift.io — Sites web clé en main pour indépendants";
 const DESCRIPTION =
@@ -50,7 +50,7 @@ const NAV = [
 function Logo({ className = "", light = false }: { className?: string; light?: boolean }) {
   return (
     <img
-      src={logoAsset.url}
+      src={logoUrl}
       alt="Swift.io"
       className={`h-8 w-auto ${className} ${light ? "brightness-0 invert" : ""}`}
     />
