@@ -4,6 +4,7 @@ import heroMockup from "@/assets/hero-mockup.jpg";
 import portfolioArtisan from "@/assets/portfolio-artisan.jpg";
 import portfolioServices from "@/assets/portfolio-services.jpg";
 import portfolioConsultant from "@/assets/portfolio-consultant.jpg";
+import logoAsset from "@/assets/swift-logo.png.asset.json";
 
 const TITLE = "Swift.io — Sites web clé en main pour indépendants";
 const DESCRIPTION =
@@ -46,21 +47,13 @@ const NAV = [
   { label: "FAQ", href: "#faq" },
 ];
 
-function Logo({ className = "" }: { className?: string }) {
+function Logo({ className = "", light = false }: { className?: string; light?: boolean }) {
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
-      <svg viewBox="0 0 32 32" className="h-8 w-8 shrink-0" aria-hidden="true">
-        <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#swiftGrad)" />
-        <path d="M21 10H14.5a3.5 3.5 0 0 0 0 7H18a3.5 3.5 0 0 1 0 7H11" stroke="white" strokeWidth="2.4" strokeLinecap="round" fill="none" />
-        <defs>
-          <linearGradient id="swiftGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="oklch(0.55 0.23 268)" />
-            <stop offset="100%" stopColor="oklch(0.78 0.14 200)" />
-          </linearGradient>
-        </defs>
-      </svg>
-      <span className="text-lg font-extrabold tracking-tight">Swift.io</span>
-    </span>
+    <img
+      src={logoAsset.url}
+      alt="Swift.io"
+      className={`h-8 w-auto ${className} ${light ? "brightness-0 invert" : ""}`}
+    />
   );
 }
 
@@ -85,7 +78,7 @@ function Landing() {
 function Header() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-border/70 bg-background backdrop-blur-xl">
       <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-4 lg:flex lg:justify-between">
         <a href="#top" className="min-w-0">
           <Logo />
@@ -369,14 +362,14 @@ function Process() {
 const PLANS = [
   {
     name: "Essentiel",
-    price: "690 €",
+    price: "590 €",
     text: "Idéal pour démarrer avec une présence pro et crédible.",
     features: ["Site 1 page (one-page)", "Design sur-mesure", "Formulaire de contact", "Mise en ligne incluse"],
     featured: false,
   },
   {
     name: "Professionnel",
-    price: "1 190 €",
+    price: "990 €",
     text: "Le choix des indépendants qui veulent générer des demandes.",
     features: ["Jusqu'à 5 pages", "SEO local optimisé", "Galerie / réalisations", "Support dédié 3 mois"],
     featured: true,
@@ -488,8 +481,7 @@ function Contact() {
             text="Décrivez votre activité en quelques lignes : nous revenons vers vous sous 24h avec une proposition claire et un délai précis."
           />
           <ul className="mt-8 space-y-3 text-sm text-muted-foreground">
-            <li>contact@swift.io</li>
-            <li>+33 6 12 34 56 78</li>
+            <li>swift.io711@gmail.com</li>
             <li>Du lundi au vendredi, 9h – 18h</li>
           </ul>
         </div>
@@ -572,7 +564,7 @@ function Footer() {
       <div className="mx-auto max-w-6xl px-5 py-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Logo className="text-surface-foreground" />
+            <Logo className="text-surface-foreground" light />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-surface-foreground/60">
               Agence digitale spécialisée dans les sites web clé en main pour indépendants et
               auto-entrepreneurs.
@@ -593,8 +585,7 @@ function Footer() {
           <FooterCol
             title="Contact"
             links={[
-              { label: "contact@swift.io", href: "mailto:contact@swift.io" },
-              { label: "+33 6 12 34 56 78", href: "tel:+33612345678" },
+              { label: "swift.io711@gmail.com", href: "mailto:swift.io711@gmail.com" },
               { label: "Demander un devis", href: "#contact" },
             ]}
           />
