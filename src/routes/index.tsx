@@ -4,7 +4,7 @@ import heroMockup from "@/assets/hero-mockup.jpg";
 import portfolioArtisan from "@/assets/portfolio-artisan.jpg";
 import portfolioServices from "@/assets/portfolio-services.jpg";
 import portfolioConsultant from "@/assets/portfolio-consultant.jpg";
-import logoAsset from "@/assets/swift-logo.png.asset.json";
+import logoUrl from "@/assets/swift-logo.png";
 
 const TITLE = "Swift.io — Sites web clé en main pour indépendants";
 const DESCRIPTION =
@@ -50,7 +50,7 @@ const NAV = [
 function Logo({ className = "", light = false }: { className?: string; light?: boolean }) {
   return (
     <img
-      src={logoAsset.url}
+      src={logoUrl}
       alt="Swift.io"
       className={`h-8 w-auto ${className} ${light ? "brightness-0 invert" : ""}`}
     />
@@ -488,6 +488,21 @@ function Contact() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            // 100% front-end : la demande part par email via le client de messagerie
+            const data = new FormData(e.currentTarget);
+            const get = (k: string) => String(data.get(k) ?? "").trim();
+            const body = [
+              `Nom : ${get("name")}`,
+              `Activité / Entreprise : ${get("activity")}`,
+              `Email : ${get("email")}`,
+              `Téléphone : ${get("phone") || "—"}`,
+              "",
+              "Projet :",
+              get("details"),
+            ].join("\n");
+            window.location.href = `mailto:swift.io711@gmail.com?subject=${encodeURIComponent(
+              `Demande de devis — ${get("activity") || get("name")}`,
+            )}&body=${encodeURIComponent(body)}`;
             setSent(true);
           }}
           className="rounded-2xl border border-border bg-card p-7 shadow-lift sm:p-9"
