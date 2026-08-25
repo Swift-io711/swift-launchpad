@@ -1,41 +1,43 @@
 // Exporte le site en 100% statique (HTML + CSS + JS + images) dans dist/static/
-// Utilisation : npm run build && node scripts/export-static.mjs
-// Le dossier dist/static peut ensuite être uploadé par FTP sur un hébergement mutualisé.
-import { spawn } from "node:child_process";
+// Utilisation :
+//   npm run build && node scripts/export-static.mjs
+// Puis envoyez le contenu de dist/static/ par FTP dans le dossier public de votre
+// hébergement mutualisé (www / public_html). Aucun serveur Node n'est nécessaire.
 import { cp, mkdir, writeFile, rm } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
+import { resolve } from "node:path";
 
-const PORT = 4183;
 const OUT = "dist/static";
+const ROUTES = ["/"];
 
-const preview = spawn("npx", ["vite", "preview", "--port", String(PORT), "--host", "127.0.0.1"], {
-  stdio: ["ignore", "inherit", "inherit"],
-});
+const entry = pathToFileURL(resolve("dist/server/index.mjs")).href;
+const mod = await import(entry);
+const handler = mod.default ?? mod;
 
-async function waitForServer() {
-  for (let i = 0; i < 60; i++) {
-    try {
-      const res = await fetch(`http://127.0.0.1:${PORT}/`);
-      if (res.ok) return await res.text();
-    } catch {
-      /* pas encore prêt */
-    }
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  throw new Error("Le serveur de preview n'a pas démarré");
+await rm(OUT, { recursive: true, force: true });
+await mkdir(OUT, { recursive: true });
+await cp("dist/client", OUT, { recursive: true });
+await rm(`${OUT}/_headers`, { force: true });
+
+let firstHtml = "";
+for (const route of ROUTES) {
+  const res = await handler.fetch(new Request(`http://localhost${route}`), {}, {
+    waitUntil() {},
+    passThroughOnException() {},
+  });
+  if (!res.ok) throw new Error(`Rendu de ${route} échoué (${res.status})`);
+  const html = await res.text();
+  if (!firstHtml) firstHtml = html;
+  const file = route === "/" ? "index.html" : `${route.replace(/^\//, "")}/index.html`;
+  await mkdir(resolve(OUT, file, ".."), { recursive: true });
+  await writeFile(resolve(OUT, file), html);
+  console.log(`✔ ${file}`);
 }
 
-try {
-  const html = await waitForServer();
-  await rm(OUT, { recursive: true, force: true });
-  await mkdir(OUT, { recursive: true });
-  await cp("dist/client", OUT, { recursive: true });
-  await rm(`${OUT}/_headers`, { force: true });
-  await writeFile(`${OUT}/index.html`, html);
-  // Fallback pour les URLs inconnues (une seule page ici)
-  await writeFile(`${OUT}/404.html`, html);
-  await writeFile(
-    `${OUT}/.htaccess`,
-    `# Hébergement mutualisé Apache : cache des assets + fallback vers index.html
+await writeFile(`${OUT}/404.html`, firstHtml);
+await writeFile(
+  `${OUT}/.htaccess`,
+  `# Hébergement mutualisé Apache : fallback + cache des assets
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteCond %{REQUEST_FILENAME} -f [OR]
@@ -51,8 +53,6 @@ try {
   ExpiresByType image/png "access plus 1 year"
 </IfModule>
 `,
-  );
-  console.log(`✔ Site statique généré dans ${OUT}/`);
-} finally {
-  preview.kill("SIGKILL");
-}
+);
+
+console.log(`\n✔ Site statique prêt dans ${OUT}/ — à uploader tel quel par FTP.`);
